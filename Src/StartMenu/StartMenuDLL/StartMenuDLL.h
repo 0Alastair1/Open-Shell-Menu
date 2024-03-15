@@ -14,6 +14,7 @@
 
 // Find the taskbar window for the given process
 STARTMENUAPI HWND FindTaskBar( DWORD process );
+STARTMENUAPI HWND FindRetroBar();
 
 // WH_GETMESSAGE hook for the explorer's GUI thread. The start menu exe uses this hook to inject code into the explorer process
 STARTMENUAPI LRESULT CALLBACK HookInject( int code, WPARAM wParam, LPARAM lParam );
