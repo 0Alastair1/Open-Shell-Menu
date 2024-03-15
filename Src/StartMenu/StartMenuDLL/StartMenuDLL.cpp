@@ -477,6 +477,39 @@ STARTMENUAPI HWND FindTaskBar( DWORD process )
 	return g_TaskBar;
 }
 
+STARTMENUAPI HWND FindRetroBar()
+{
+	g_WinStartButton = NULL;
+	g_TaskBar = NULL;
+	g_Tooltip = NULL;
+	// find the retrobar
+	if (!g_TaskBar)
+		g_TaskBar = FindWindowEx(GetDesktopWindow(), NULL, NULL, L"RetroBar Taskbar");
+	if (g_TaskBar)
+	{
+		// find start button
+		if (GetWinVersion() == WIN_VER_WIN7)
+			EnumThreadWindows(GetWindowThreadProcessId(g_TaskBar, NULL), FindStartButtonEnum, NULL);
+		if (GetWindowThreadProcessId(g_TaskBar, NULL) == GetCurrentThreadId())
+		{
+			// find tooltip
+			if (g_WinStartButton)
+			{
+				EnumThreadWindows(GetWindowThreadProcessId(g_TaskBar, NULL), FindTooltipEnum, NULL);
+				if (g_Tooltip)
+				{
+					g_StartButtonTool.cbSize = sizeof(g_StartButtonTool);
+					g_StartButtonTool.hwnd = g_TaskBar;
+					g_StartButtonTool.uId = (UINT_PTR)g_WinStartButton;
+					SendMessage(g_Tooltip, TTM_GETTOOLINFO, 0, (LPARAM)&g_StartButtonTool);
+				}
+			}
+			g_OwnerWindow = g_Owner.Create(NULL, 0, 0, WS_POPUP, WS_EX_TOOLWINDOW | WS_EX_TOPMOST);
+		}
+	}
+	return g_TaskBar;
+}
+
 #ifdef HOOK_DROPTARGET
 class CStartMenuTarget: public IDropTarget
 {
